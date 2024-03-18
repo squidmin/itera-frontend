@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://amphii.me", "https://james-m-5afqr6ijoq-uc.a.run.app"],
+    "responseHeader": ["Content-Type"],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 3600
+  }
+]

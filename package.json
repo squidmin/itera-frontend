@@ -1,0 +1,71 @@
+{
+  "name": "itera-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.10",
+    "@mui/material": "^5.15.10",
+    "@reduxjs/toolkit": "^2.2.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.80",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "axios": "^1.6.8",
+    "buffer": "^6.0.3",
+    "dompurify": "^3.0.9",
+    "hast-util-raw": "^9.0.2",
+    "parse5": "^7.1.2",
+    "prismjs": "^1.29.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.22.1",
+    "react-scripts": "5.0.1",
+    "react-spring": "^9.7.3",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0",
+    "rehype-prism-plus": "^2.0.0",
+    "rehype-raw": "^7.0.0",
+    "stream-browserify": "^3.0.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "xml-js": "^1.6.11"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/dompurify": "^3.0.5",
+    "@types/react-redux": "^7.1.33",
+    "react-app-rewired": "^2.2.1",
+    "source-map-loader": "^5.0.0"
+  }
+}

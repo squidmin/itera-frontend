@@ -1,0 +1,69 @@
+:root {
+  --background-light: #fff;
+  --background-dark: #111;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  min-height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll if not needed */
+  /*overflow-y: hidden;*/
+  background-color: var(--background-dark); /* Example for dark theme; adjust the color as needed */
+}
+
+#root, .App {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent; /* Prevent overriding the body/html background */
+}
+
+.App {
+  min-height: 100vh; /* 100% of the viewport height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes the footer to the bottom */
+  background-color: transparent; /* Avoid overriding body/html background */
+}
+
+.App.light {
+  background-color: var(--background-light);
+  color: #000;
+}
+
+.App.dark {
+  background-color: var(--background-dark);
+  color: #fff;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 1rem; /* Adjust based on header padding */
+  right: 1rem; /* Adjust for desired spacing from the right edge */
+  padding-right: 50px;
+}
+
+.App-header {
+  /*position: relative;*/
+  display: flex;
+  justify-content: space-between; /* Align items on opposite ends */
+  padding: 1rem; /* Adjust padding as needed */
+  align-items: center; /* Center items vertically */
+  width: 100%;
+}
+
+.form-control-label {
+  font-size: 0.5rem; /* Adjust the font size as needed */
+}
+
+a, a:visited {
+  color: #0077b5; /* Specify your desired link color */
+  text-decoration: none; /* Optional: removes underline */
+}
+
+body.dark a, body.dark a:visited {
+  color: #e0e0e0; /* Light color for dark backgrounds */
+}
