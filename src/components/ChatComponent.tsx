@@ -48,6 +48,7 @@ export const ChatComponent = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null); // Ref for accessing the input element
   const [arrowDirection, setArrowDirection] = useState(''); // New state for arrow direction ('up', 'down', or '')
   const [showArrow, setShowArrow] = useState(false); // State to control Fade component
+  const arrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const newHeight = Math.max(10, input.split('\n').length * 20); // Adjust '20' based on your styling
@@ -66,15 +67,19 @@ export const ChatComponent = () => {
     }
   }, [input]); // Recalculate when input changes
 
+  useEffect(() => {
+    console.log("Updated Category: ", category); // Debugging
+  }, [category]);
 
   const handleSend = async () => {
     if (input.trim()) {
       // Dispatch user's message to Redux store
       //dispatch(addMessage({ id: Date.now().toString(), text: input, sender: 'user' }));
       dispatch(sendMessage(input));
-      setInputHistory(prevHistory => [...prevHistory, input]); // Update history with the new input
-      setHistoryIndex(-1); // Reset history index
+      setInputHistory([...inputHistory, input]); // Add the new input to the history
+      setHistoryIndex(inputHistory.length); // Point to the latest message (which will be added)
       setInput(''); // Optionally clear the input field here or in the .then() after dispatch if you want to ensure it clears after a successful send
+      setCategory('Uncategorized'); // Reset the category back to default
       setHasMessages(true); // Update state to reflect that a message has been submitted
     }
   };
@@ -82,6 +87,7 @@ export const ChatComponent = () => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setInput(inputValue);
+    console.log("Detected Category: ", category); // Debugging
     setCategory(categorizePrompt(inputValue)); // Update the category based on the new input
   };
 
@@ -91,28 +97,53 @@ export const ChatComponent = () => {
       handleSend(); // Send the message
       event.preventDefault(); // Prevent the default behavior of pressing Enter
     }
-    // Check if Enter and Shift keys are pressed
-    if (event.key === 'Enter' && event.shiftKey) {
+    // Allow Shift+Enter to insert a newline
+    else if (event.key === 'Enter' && event.shiftKey) {
       event.preventDefault();
-      setInput(prevInput => prevInput + '\n');
+      setInput(prevInput => `${prevInput}\n`);
     }
     // Navigate history with Shift+Up
-    else if (event.key === 'ArrowUp' && event.altKey && historyIndex < inputHistory.length - 1) {
+    else if (event.key === 'ArrowUp' && event.altKey && historyIndex > 0) {
       event.preventDefault();
-      setInputHistoryState(1); // Navigate back in history
+      if (historyIndex > 0 || historyIndex === 0 && inputHistory.length > 0) {
+        setInputHistoryState(-1); // Adjust historyIndex to navigate back
+      }
       setArrowDirection('up'); // Show the up arrow
+      // Clear the existing timeout
+      if (arrowTimeoutRef.current) {
+        clearTimeout(arrowTimeoutRef.current);
+      }
       setShowArrow(true); // Make arrow visible
       // Hide the arrow after a delay
-      setTimeout(() => setShowArrow(false), 1000); // Adjust delay as needed
+      // Set a new timeout to hide the arrow
+      arrowTimeoutRef.current = setTimeout(() => {
+        setShowArrow(false);
+        setArrowDirection(''); // Also clear the arrow direction
+        arrowTimeoutRef.current = null;
+      }, 1000); // Adjust time as needed
     }
     // Navigate history with Shift+Down
-    else if (event.key === 'ArrowDown' && event.altKey && historyIndex >= 0) {
+    else if (event.key === 'ArrowDown' && event.altKey && historyIndex < inputHistory.length) {
       event.preventDefault();
-      setInputHistoryState(-1); // Navigate forward in history
+      if (historyIndex < inputHistory.length - 1) {
+        setInputHistoryState(1); // Navigate forward in history
+      } else {
+        setInput(''); // Clear the input if at the end of history
+        setHistoryIndex(-1);
+      }
       setArrowDirection('down'); // Show the down arrow
+      // Clear the existing timeout
+      if (arrowTimeoutRef.current) {
+        clearTimeout(arrowTimeoutRef.current);
+      }
       setShowArrow(true); // Make arrow visible
       // Hide the arrow after a delay
-      setTimeout(() => setShowArrow(false), 1000); // Adjust delay as needed
+      // Set a new timeout to hide the arrow
+      arrowTimeoutRef.current = setTimeout(() => {
+        setShowArrow(false);
+        setArrowDirection(''); // Also clear the arrow direction
+        arrowTimeoutRef.current = null;
+      }, 1000); // Adjust time as needed
     }
   };
 
@@ -121,25 +152,20 @@ export const ChatComponent = () => {
     if (showArrow) {
       fadeOutTimeout = setTimeout(() => {
         setShowArrow(false);
-      }, 2000); // Match this duration with your Fade timeout for consistency
+      }, 1000); // Match this duration with your Fade timeout for consistency
     }
     return () => clearTimeout(fadeOutTimeout); // Cleanup on unmount or before a new timeout is set
   }, [showArrow]);
 
   const setInputHistoryState = (direction: number) => {
-    // direction = -1 for previous, 1 for next
-    setHistoryIndex(currentIndex => {
-      let newIndex = currentIndex + direction;
-      // Ensure the new index remains within the bounds of the history array
-      newIndex = Math.max(Math.min(newIndex, inputHistory.length - 1), -1);
-      if (newIndex >= 0 && inputHistory[newIndex]) {
+    setHistoryIndex((currentIndex) => {
+      const newIndex = currentIndex + direction;
+      // Ensure newIndex stays within bounds
+      if (newIndex >= 0 && newIndex < inputHistory.length) {
         setInput(inputHistory[newIndex]);
+        return newIndex;
       }
-      // If newIndex is -1, clear the input (this allows the user to return to the "new input" state)
-      if (newIndex === -1) {
-        setInput('');
-      }
-      return newIndex;
+      return currentIndex;
     });
   };
 
@@ -147,6 +173,7 @@ export const ChatComponent = () => {
     const categories = {
       'Question and Answer': ['who', 'what', 'where', 'when', 'why', 'how'],
       'Conversational': ['hi', 'hello', 'hey'],
+      'Text Generation': ['write', 'a paragraph', 'plain text'],
       'Text Completion': ['complete', 'finish'],
       'Code Translation': [
         "translate", "translate code from", "convert code to", "from python to javascript",
@@ -196,7 +223,7 @@ export const ChatComponent = () => {
     <Box sx={{position: 'fixed', bottom: 0, width: '100%', zIndex: 'tooltip'}}>
       {/* Category display at the top */}
       <Box sx={{position: 'relative', width: '100%', p: 1,}}>
-        <Typography sx={{position: 'relative', textAlign: 'right', paddingRight: 50, fontStyle: 'italic'}}>
+        <Typography sx={{position: 'relative', textAlign: 'right', paddingRight: 20, fontStyle: 'italic'}}>
           <strong>Category</strong>: {category}
         </Typography>
       </Box>
@@ -259,7 +286,7 @@ export const ChatComponent = () => {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Fade in={showArrow} timeout={500} style={{position: 'absolute'}}>
+              <Fade in={showArrow} timeout={1000} style={{position: 'absolute'}}>
                 <Box sx={{visibility: showArrow ? 'visible' : 'hidden'}}>
                   {arrowDirection === 'up' ? <ArrowUpward sx={{color: 'primary.main'}}/> : null}
                   {arrowDirection === 'down' ? <ArrowDownward sx={{color: 'primary.main'}}/> : null}
