@@ -73,9 +73,7 @@ export const ChatComponent = () => {
 
   const handleSend = async () => {
     if (input.trim()) {
-      // Dispatch user's message to Redux store
-      //dispatch(addMessage({ id: Date.now().toString(), text: input, sender: 'user' }));
-      dispatch(sendMessage(input));
+      dispatch(sendMessage(input)); // Dispatch user's message to Redux store
       setInputHistory([...inputHistory, input]); // Add the new input to the history
       setHistoryIndex(inputHistory.length); // Point to the latest message (which will be added)
       setInput(''); // Optionally clear the input field here or in the .then() after dispatch if you want to ensure it clears after a successful send
@@ -171,10 +169,14 @@ export const ChatComponent = () => {
 
   const categorizePrompt = (input: string) => {
     const categories = {
-      'Question and Answer': ['who', 'what', 'where', 'when', 'why', 'how'],
-      'Conversational': ['hi', 'hello', 'hey'],
-      'Text Generation': ['write', 'a paragraph', 'plain text'],
-      'Text Completion': ['complete', 'finish'],
+      'Question and Answer': ['who', 'what', 'where', 'when', 'why', 'how',],
+      'Conversational': ['hi', 'hello', 'hey',],
+      'Text Generation': ['write', 'a paragraph', 'plain text',],
+      'Text Completion': ['complete', 'finish',],
+      'Run Code': [
+        'run', 'run the below', 'execute the below', 'execute', 'evaluate', 'interpret', 'calculate', 'compute',
+        'solve', 'play',
+      ],
       'Code Translation': [
         "translate", "translate code from", "convert code to", "from python to javascript",
         "c++ to java conversion", "javascript to typescript", "python to c#",
@@ -183,7 +185,10 @@ export const ChatComponent = () => {
         "version in java", "equivalent in c++", "rewrite in", "from ruby to",
         "to swift", "to c++", "to java", "to python", "to javascript", "java to c++",
       ],
-      'Code Generation': ['generate code', 'code snippet for', 'implement', 'algorithm', 'python', 'javascript', 'java', 'function', 'class', 'method', 'loop', 'array', 'list', 'dictionary', 'object'],
+      'Code Generation': [
+        'generate code', 'code snippet for', 'implement', 'algorithm', 'python', 'javascript', 'java', 'function',
+        'class', 'method', 'loop', 'array', 'list', 'dictionary', 'object',
+      ],
     };
 
     let bestMatchCategory = 'Uncategorized';
